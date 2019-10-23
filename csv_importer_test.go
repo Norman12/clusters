@@ -29,9 +29,9 @@ func TestImportedLoadCorrectData(t *testing.T) {
 		f = "data/test.csv"
 		i = CsvImporter()
 		s = [][]float64{
-			[]float64{0.1, 0.2, 0.3},
-			[]float64{0.4, 0.5, 0.6},
-			[]float64{0.7, 0.8, 0.9},
+			{0.1, 0.2, 0.3},
+			{0.4, 0.5, 0.6},
+			{0.7, 0.8, 0.9},
 		}
 	)
 
@@ -41,7 +41,7 @@ func TestImportedLoadCorrectData(t *testing.T) {
 	}
 
 	if !fsliceEqual(d, s) {
-		t.Error("Imported data mismatch: %v vs %v\n", d, s)
+		t.Errorf("Imported data mismatch: %v vs %v\n", d, s)
 	}
 }
 
