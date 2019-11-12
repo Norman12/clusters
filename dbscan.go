@@ -11,16 +11,25 @@ type dbscanClusterer struct {
 	distance DistanceFunc
 
 	// slices holding the cluster mapping and sizes. Access is synchronized to avoid read during computation.
-	mu   sync.RWMutex
-	a, b []int
+	mu sync.RWMutex
+	// groups for dateset
+	a []int
+	b []int
 
 	// variables used for concurrent computation of nearest neighbours
-	l, s, o, f int
-	j          chan *rangeJob
-	m          *sync.Mutex
-	w          *sync.WaitGroup
-	r          *[]int
-	p          []float64
+	// dataset len
+	l int
+	// worker number
+	s int
+	// work number for per worker
+	f int
+	j chan *rangeJob
+	m *sync.Mutex
+	w *sync.WaitGroup
+	// current point near
+	r *[]int
+	// current point
+	p []float64
 
 	// visited points
 	v []bool
@@ -78,7 +87,6 @@ func (c *dbscanClusterer) Learn(data [][]float64) error {
 
 	c.l = len(data)
 	c.s = c.numWorkers()
-	c.o = c.s - 1
 	c.f = c.l / c.s
 
 	c.d = data
@@ -198,15 +206,14 @@ func (c *dbscanClusterer) nearest(p int, l *int, r *[]int) {
 	c.p = c.d[p]
 	c.r = r
 
-	c.w.Add(c.s)
-
 	for i := 0; i < c.l; i += c.f {
 		if c.l-i <= c.f {
-			b = c.l - 1
+			b = c.l
 		} else {
 			b = i + c.f
 		}
 
+		c.w.Add(1)
 		c.j <- &rangeJob{
 			a: i,
 			b: b,

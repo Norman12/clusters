@@ -4,7 +4,7 @@ import (
 	"testing"
 )
 
-func TestKmeansClusterNumerMatches(t *testing.T) {
+func TestKmeansClusterNumberMatches(t *testing.T) {
 	const (
 		C = 8
 	)
